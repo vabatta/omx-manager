@@ -5,7 +5,7 @@ describe('Looper', function() {
     it('should return next in array', function() {
       var Looper = require('../lib/looper');
 
-      var loopFiles = new Looper(['a', 'b', 'c']);
+      var loopFiles = Looper(['a', 'b', 'c']);
       chai.expect(loopFiles.getNext()).to.equal('a');
     });
   });
@@ -16,7 +16,7 @@ describe('Looper', function() {
     it('should return all the elements in order', function() {
       var Looper = require('../lib/looper');
 
-      var loopFiles = new Looper(['a', 'b', 'c']);
+      var loopFiles = Looper(['a', 'b', 'c']);
       chai.expect(loopFiles.getNext()).to.equal('a');
       chai.expect(loopFiles.getNext()).to.equal('b');
       chai.expect(loopFiles.getNext()).to.equal('c');
@@ -29,7 +29,7 @@ describe('Looper', function() {
     it('should return the first on array end', function() {
       var Looper = require('../lib/looper');
 
-      var loopFiles = new Looper(['a', 'b', 'c'], true);
+      var loopFiles = Looper(['a', 'b', 'c'], true);
       chai.expect(loopFiles.getNext()).to.equal('a');
       chai.expect(loopFiles.getNext()).to.equal('b');
       chai.expect(loopFiles.getNext()).to.equal('c');
