@@ -1,7 +1,7 @@
 {
   "name": "omx-manager",
   "version": "0.0.1",
-  "description": "Provide a nodejs interface for omxplayer (Raspberry Pi player).",
+  "description": "Provide a complete nodejs interface for omxplayer (Raspberry Pi player).",
   "main": "lib/main.js",
   "private": true,
   "repository": {
