@@ -1,8 +1,11 @@
 {
   "name": "omx-manager",
   "version": "0.0.1",
-  "description": "Provide a complete nodejs interface for omxplayer (Raspberry Pi player).",
+  "description": "Provide a simple and complete interface to omxplayer (Raspberry Pi player).",
   "main": "lib/main.js",
+  "scripts": {
+    "test": "mocha"
+  },
   "private": true,
   "repository": {
     "type": "git",
@@ -21,6 +24,8 @@
   "author": "Valerio Battaglia",
   "license": "MIT",
   "devDependencies": {
-    "chai": "^1.9.1"
+    "chai": "^1.9.1",
+    "jsdoc": "^3.3.0-alpha9",
+    "mocha": "^1.20.1"
   }
 }
