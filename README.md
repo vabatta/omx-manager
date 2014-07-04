@@ -12,7 +12,7 @@
  * Provide a fallback if `omxplayer` doesn't support loop natively
  * Can take any arguments to use when spawning
 
-**Note**: Complete **doc** can be found on [github repo](https://github.com/vabatta/omx-manager).
+**Note**: Complete **doc** can be found on [github repo pages](http://vabatta.github.io/omx-manager/).
  
 
 ## Usage
