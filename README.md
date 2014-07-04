@@ -1,57 +1,68 @@
-# omxdirector
+# omx-manager
 
-Nodejs module providing a simple interface to omxplayer.
+omx-manager is a Nodejs module providing a simple and complete interface to *official* [omxplayer](https://github.com/popcornmix/omxplayer).
 
-Supports multiple files playing and loops. It's capable of seamless
-loops if `omxplayer` supports it natively. When `omxplayer` doesn't
-support loops, this module handles loops respawning omxplayer
-process.
+Supports multiple files and loop. 
+Supports `omxplayer` native loop (with some condition, see [below](#nativeloop)).
+Otherwise if `omxplayer` doesn't support loops, this module handles loops respawning omxplayer process.
+In addition it supports any valid arguments to use when spawning (you can find it on  [omxplayer](https://github.com/popcornmix/omxplayer) repo).
 
 ## Usage
 
 ### Basic usage
 
-    var omx = require('omxdirector');
+    var omx = require('omx-manager');
     omx.play('video.avi');
 
 ### Multiple files
 
-    omx.play(['video.mp4', 'anothervideo.mp4', 'foo.mp4'], {loop: true});
+    omx.play(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 
-**WARNING:** at this time, multiple files playing is not supported by *official* **omxplayer**.
-If using with a fork version, you must enable native loop support (see below).
+**WARNING:** at this time, multiple files playing is not supported by *official* **omxplayer**, so omx-manager will handle it.
 
-### Options
+### Arguments
 
- - **audioOutput** `"local"` or `"hdmi"` as `-o` omxplayer argument. If not specified or `"default"` is system default.
- - **loop** `true` to enable `--loop` omxplayer argument. Default is `false`.
+Any valid arguments declared in the [omxplayer](https://github.com/popcornmix/omxplayer) repo.
+This is an object, and to set an arg with value use key: value, otherwise use key: true to enable it.
 
-**WARNING:** at this time, loop is not supported by *official* **omxplayer**.
-If using with a fork version, you must enable native loop support. 
+Note: About **loop** see [below](#nativeloop).
 
-#### Example
+#### Example object
 
-    omx.play('video.mp4', {loop: true}); // enables loop
-    omx.play('video.mp4', {audioOutput: 'local'}); // analog audio output
+    {
+      '--vol': 13,
+      '-p': true
+    }
 
+#### Example play
+
+    omx.play('video.mp4', {'-p': true}); // enables audio passthrough
+    omx.play('video.mp4', {'-o': 'local'}); // analog audio output
+
+<a name="nativeloop"></a>
 ### Native loop support
 
-If you have a versione of `omxplayer` supporting native loop with `--loop` flag,
-you can enable it by calling:
+*Official*`omxplayer` supports native loop with `--loop` flag (but only for 1 video), you can enable it by calling:
 
-    var omx = require('omxdirector').enableNativeLoop();
+    var omx = require('omx-manager').enableNativeLoop();
+    omx.play('video.avi', {'--loop': true}); // this will start omx player with '--loop'
+
+In case you pass more than 1 video with a loop flag, omx-manager will handle loop:
+
+    var omx = require('omx-manager');
+    omx.play(['video.avi', 'anothervideo.avi'], {'--loop': true}); 
+    // this will start omx player without '--loop', and omx-manager will handle loop
 
 ### Loop fallback
 
-If using with standard omxplayer, a fallback is provided: once a video is finished,
-another process of omxplayer is launched. It support multiple files and infinite loop.
-Although this works fine, native support is better because there's no gap between video.
+*Official* `omxplayer` **doesn't** supports native loop over **multiple files**, so omx-manager provide a fallback:
+once a video is ended, another process of omxplayer is spawned. (Looper lib)
 
 ### Status
 
     omx.getStatus()
 
-Return an object with current status:
+Return an object with current status.
 
 If process is not running:
 
@@ -62,39 +73,49 @@ If process is running:
     {
       loaded: true,
       videos: <Array>,    // videos array passed to play(videos, options)
-      settings: <Object>,  // default settings or options object passed to play(videos, options)
+      current: <String>, // current video playing
+      args: <Object>,  // default settings or options object passed to play(videos, options)
       playing: <boolean>  // true if not paused, false if paused
     }
 
-### Video directory
+### Videos directory
 
-    omx.setVideoDir(path);
+    omx.setVideosDirectory(path);
 
 Set where to look for videos. Useful when all videos are in the same directory.
 
 Instead of this:
 
-    omx.play(['/home/pi/videos/foo.mp4', '/home/pi/videos/bar.mp4', '/home/pi/videos/asdasd.mp4']);
+    omx.play(['/home/pi/videos/foo.mp4', '/home/pi/videos/bar.mp4', '/home/pi/videos/baz.mp4']);
 
 It's possible to use this shortcut:
 
-    omx.setVideoDir('/home/pi/videos/');
-    omx.play(['foo.mp4', 'bar.mp4', 'asdasd.mp4']);
+    omx.setVideosDirectory('/home/pi/videos/');
+    omx.play(['foo.mp4', 'bar.mp4', 'baz.mp4']);
 
-### Video suffix
+### Videos extension
 
-    omx.setVideoSuffix(suffix);
+    omx.setVideosExtension(extension);
 
-Set a suffix for videos. Useful when all videos share the same format.
+Set an extension for videos. Useful when all videos share the same format.
 
 Instead of this:
 
-    omx.play(['foo.mp4', 'bar.mp4', 'asdasd.mp4']);
+    omx.play(['foo.mp4', 'bar.mp4', 'baz.mp4']);
 
 It's possible to use this shortcut:
 
-    omx.setVideoSuffix('.mp4');
-    omx.play(['foo', 'bar', 'asdasd']);
+    omx.setVideosExtension('.mp4');
+    omx.play(['foo', 'bar', 'baz']);
+
+### Omx command
+
+    omx.setOmxCommand(command);
+    
+Set the default command to spawn. Useful when `omxplayer` isn't in your path or you want to specify a different name for the spawn.
+
+    omx.setOmxCommand('/usr/local/bin/mxplayer');
+    omx.play('video.avi'); // the process is spawned calling '/usr/local/bin/mxplayer'
 
 ### Other methods
 
@@ -106,14 +127,12 @@ It's possible to use this shortcut:
 
 ### Events
 
-    omx.on('load', function(files, options){}); // video successfully loaded (omxprocess starts)
-    omx.on('play', function(){});  // when successfully started or resumed from pause
-    omx.on('pause', function(){}); // when successfully paused
-    omx.on('stop', function(){});  // when successfully stopped (omxplayer process ends)
+    omx.on('load', function(videos, args) {}); // videos successfully loaded and started (omxprocess starts)
+    omx.on('play', function() {});  // when successfully started a video or resumed from pause
+    omx.on('pause', function() {}); // when successfully paused
+    omx.on('stop', function() {});  // when successfully stopped (omxplayer process ends)
+    omx.on('end', function() {}); // when videos to play are ended
 
 ## TODO
 
- - Emit event when each video start, stop etc...
  - Implement forward/backward.
- - Enable a fallback for loop and multiple files when native support is disabled.
- 
