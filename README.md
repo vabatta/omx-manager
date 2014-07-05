@@ -1,7 +1,7 @@
 # Module omx-manager
 
-`omx-manager` is a Nodejs module providing a simple and complete interface to *official* [omxplayer](https://github.com/popcornmix/omxplayer).
-**Note:** You can also use a fork version, but you should adjust `omx-manager` according to your version.
+`omx-manager` is a Nodejs module providing a simple and complete interface to *official* [omxplayer](https://github.com/popcornmix/omxplayer). <br />
+**Note:** You can also use a fork version, but you should adjust `omx-manager` according to your version. <br />
 **Note 2:** This README is made with *official* [omxplayer](https://github.com/popcornmix/omxplayer) in mind.
 
 
@@ -35,7 +35,7 @@ omx.play(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 <a name="nativeloop"></a>
 ### Native loop support
 
-*Official*`omxplayer` supports native loop with `--loop` flag (but only for 1 video):
+*Official* `omxplayer` supports native loop with `--loop` flag (but only for 1 video):
 ```javascript
 var omx = require('omx-manager');
 omx.play('video.avi', {'--loop': true}); 
@@ -106,7 +106,7 @@ Note: About **loop** see [above](#nativeloop).
   '-p': true,
   '--vol': 13,
   '-p': true,
-  '--argument-that-doesnt-exists': true //this will be passed to omx process
+  '--argument-that-doesnt-exists': true //this will be passed to omx process (see note above)
 }
 ```
 
@@ -133,9 +133,9 @@ If process is running:
 ```javascript
 {
   loaded: true,
-  videos: <Array>,    // videos array passed to play(videos, options)
+  videos: <Array>,    // videos array passed to play(videos, args)
   current: <String>, // current video playing
-  args: <Object>,  // default settings or options object passed to play(videos, options)
+  args: <Object>,  // args object passed to play(videos, args)
   playing: <Boolean>  // true if not paused, false if paused
 }
 ```
@@ -193,13 +193,32 @@ omx.play('video.avi'); // the process is spawned calling '/usr/local/bin/mxplaye
 
 ### Other methods
 ```javascript
-omx.pause(); // pause the video
-omx.play();  // resume playing video
-omx.stop();  // stop playing video and terminate omxplayer process
+omx.pause();
+omx.play();
+omx.stop();
+omx.decreaseSpeed();
+omx.increaseSpeed();
+omx.previousAudioStream();
+omx.nextAudioStream();
+omx.previousChapter();
+omx.nextChapter();
+omx.previousSubtitleStream();
+omx.nextSubtitleStream();
+omx.toggleSubtitles();
+omx.increaseSubtitleDelay();
+omx.decreaseSubtitleDelay();
+omx.increaseVolume();
+omx.decreaseVolume();
+omx.seekForward();
+omx.seekBackward();
+omx.seekFastForward();
+omx.seekFastBackward();
 
-var loaded = omx.isLoaded();   // return true if omxprocess is running
-var playing = omx.isPlaying(); // return true if omxprocess is running and video is not paused
+var loaded = omx.isLoaded();
+var playing = omx.isPlaying();
 ```
+
+Refer to [doc](http://vabatta.github.io/omx-manager/) for complete information about api.
 
 
 ### Events
@@ -222,5 +241,5 @@ omx.on('end', function() {});
 
 
 ## TODO
-
- - Implement forward/backward.
+  
+Your suggestions are welcome!

@@ -1,6 +1,6 @@
 {
   "name": "omx-manager",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Provide a simple and complete interface to omxplayer (Raspberry Pi player).",
   "main": "lib/main.js",
   "scripts": {

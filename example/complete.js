@@ -6,4 +6,4 @@ omx.on('play', function(video) { console.log(video); });
 omx.on('stop', function() { console.log('stop'); });
 omx.on('end', function() { console.log('end'); });
 
-omx.play(['clash.mp4'], { '-b': true, '--loop': true }, true);
+omx.play(['clash.mp4'], { '-b': true }, true);
