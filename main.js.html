@@ -77,31 +77,38 @@ var _paused = false;
 /**
  * @private
  * @typedef {Object} OmxManager.Commands
- * @description Rapresents the commands keys for Omxplayer
- * @property pause {String} - Key: 'p'
- * @property quit {String} - Key: 'q'
+ * @description Rapresents the default commands keys for Omxplayer
  */
 var _commands = {
-  'pause': 'p',
-  'quit': 'q'
+  'decreaseSpeed': '1',
+  'increaseSpeed': '2',
+  'previousAudioStream': 'j',
+  'nextAudioStream': 'k',
+  'previousChapter': 'i',
+  'nextChapter': 'o',
+  'previousSubtitleStream': 'n',
+  'nextSubtitleStream': 'm',
+  'toggleSubtitles': 's',
+  'increaseSubtitleDelay': 'd',
+  'decreaseSubtitleDelay': 'f',
+  'increaseVolume': '+',
+  'decreaseVolume': '-',
+  'seekForward': '\x5b\x43',
+  'seekBackward': '\x5b\x44',
+  'seekFastForward': '\x5b\x41',
+  'seekFastBackward': '\x5B\x42'
 };
-
 
 /*---- Private Functions ----*/
 /**
- * @//private
+ * @private
  * @function _sendAction
- * @description Sends an action reported in {@link OmxManager.Commands}.
- * @param action {String} - The action to send
- * @throws {TypeError} Argument "action" must be a {String}
- * @throws {Error} "action" must be contained in {@link OmxManager.Commands}
+ * @description Sends an action (key).
+ * @param key {String} - The key to send
  */
-var _sendAction = function (action) {
-  if (typeof action !== 'string') throw new TypeError('Argument "action" must be a String!');
-  if (!_commands[action]) throw new Error('"action" must be contained in {Commands}');
-
+var _sendAction = function (key) {
   if (_omxProcess) {
-    omxProcess.stdin.write(_commands[action], function (err) {
+    _omxProcess.stdin.write(key, function (err) {
       if (err) {
         // Report/Emit this error?
         // This error was never fired during my tests on Rpi
@@ -112,7 +119,7 @@ var _sendAction = function (action) {
 
 
 /**
- * @//private
+ * @private
  * @function _resolveVideosPath
  * @description Resolve path of videos and returns only valid and existent videos array
  * @param videos {Array} - Videos to check
@@ -139,7 +146,7 @@ var _resolveVideosPath = function (videos) {
 
 
 /**
- * @//private
+ * @private
  * @function _startup
  * @description Startup the player
  * @param videos {Array} - Videos to play
@@ -239,6 +246,157 @@ var _startup = function (videos, args, loop) {
 
 
 /*---- Public Functions ----*/
+/* Functions builded inside constructor */
+
+/**
+ * @function OmxManager.decreaseSpeed
+ * @description Decrease speed (sends key '1').
+ */
+
+/**
+ * @function OmxManager.increaseSpeed
+ * @description Increase speed (sends key '2').
+ */
+
+/**
+ * @function OmxManager.previousAudioStream
+ * @description Gets previous audio stream (sends key 'j').
+ */
+
+/**
+ * @function OmxManager.nextAudioStream
+ * @description Gets next audio stream (sends key 'k').
+ */
+
+/**
+ * @function OmxManager.previousChapter
+ * @description Get previous chapter (sends key 'i').
+ */
+
+/**
+ * @function OmxManager.nextChapter
+ * @description Get next chapter (sends key 'o').
+ */
+
+/**
+ * @function OmxManager.previousSubtitleStream
+ * @description Gets previous subtitle stream (sends key 'n').
+ */
+
+/**
+ * @function OmxManager.nextSubtitleStream
+ * @description Gets next subtitle stream (sends key 'm').
+ */
+
+/**
+ * @function OmxManager.toggleSubtitles
+ * @description Toggles subtitles (sends key 's').
+ */
+
+/**
+ * @function OmxManager.increaseSubtitleDelay
+ * @description Increase subtitle delay (sends key 'd').
+ */
+
+/**
+ * @function OmxManager.decreaseSubtitleDelay
+ * @description Decrease subtitle delay (sends key 'f').
+ */
+
+/**
+ * @function OmxManager.increaseVolume
+ * @description Increase volume (sends key '+').
+ */
+
+/**
+ * @function OmxManager.decreaseVolume
+ * @description Decrease volume (sends key '-').
+ */
+
+/**
+ * @function OmxManager.seekForward
+ * @description Seek +30 s (sends key '\x5b\x43').
+ */
+
+/**
+ * @function OmxManager.seekBackward
+ * @description Seek -30 s (sends key '\x5b\x44').
+ */
+
+/**
+ * @function OmxManager.seekFastForward
+ * @description Seek +600 s (sends key '\x5b\x41').
+ */
+
+/**
+ * @function OmxManager.seekFastBackward
+ * @description Seek -600 s (sends key '\x5B\x42').
+ */
+
+
+/**
+ * @function OmxManager.stop
+ * @description Stops current Omx process (sends key 'q').
+ */
+_this.stop = function () {
+  /* ignore if process isn't running */
+  if (!_omxProcess) return;
+
+  _sendAction('q');
+  // handle with timeout
+  _looper = null;
+  _omxProcess = null;
+};
+
+
+/**
+ * @function OmxManager.pause
+ * @description Pauses video (sends key 'p').
+ */
+_this.pause = function () {
+  if (_paused) return;
+  /* ignore if process isn't running */
+  if (!_omxProcess) return;
+
+  _sendAction('p');
+  _paused = true;
+  _this.emit('pause');
+};
+
+
+/**
+ * @function OmxManager.play
+ * @description Play current Omx process or play the videos with passed args (sends key 'p').&lt;br />&lt;b>Note:&lt;/b> videos arg will be checked for existent videos.
+ * @param [videos=null] {String|Array} - Video or videos to play
+ * @param [args=null] {Object} - Args to use for playing
+ * @param [loop=false] {Boolean} - If must loop videos
+ * @throws {TypeError} Argument "videos" must be a {String} or an {Array}
+ * @throws {Error} Argument "videos" cannot be an empty {Array}
+ * @throws {TypeError} Argument "args" must be an {Object}
+ */
+_this.play = function (videos, args, loop) {
+  if (_omxProcess) {
+    if (_paused) {
+      _sendAction('p');
+      _paused = false;
+      _this.emit('play', _currentVideo);
+    }
+  } else {
+    if (typeof videos !== 'string' &amp;&amp; !(videos instanceof Array)) throw new TypeError('Argument "videos" must be a String or an Array!');
+    if (!videos) throw new Error('Argument "videos" cannot be an empty Array!');
+    if (typeof args === 'undefined') args = {};
+    if (typeof args !== 'object') throw new TypeError('Argument "args" must be an object!');
+    if (typeof loop === 'undefined') loop = false;
+
+    // Convert videos string to an array for underlying startup
+    if (typeof videos === 'string') {
+      videos = [videos];
+    }
+    _startup(videos, args, loop);
+  }
+};
+
+
 /**
  * @function OmxManager.setVideosDirectory
  * @description Sets the default videos directory.
@@ -339,71 +497,20 @@ _this.getStatus = function () {
 };
 
 
-/**
- * @function OmxManager.stop
- * @description Stops current Omx process
- */
-_this.stop = function () {
-  /* ignore if process isn't running */
-  if (!_omxProcess) return;
-
-  _sendAction('quit');
-  // handle with timeout
-  _looper = null;
-  _omxProcess = null;
-};
-
-
-/**
- * @function OmxManager.pause
- * @description Pauses current Omx process
- */
-_this.pause = function () {
-  if (_paused) return;
-  /* ignore if process isn't running */
-  if (!_omxProcess) return;
-
-  _sendAction('pause');
-  _paused = true;
-  _this.emit('pause');
-};
-
-
-/**
- * @function OmxManager.play
- * @description Play current Omx process or play the videos with passed args.&lt;br />&lt;b>Note:&lt;/b> videos arg will be checked for existent videos.
- * @param [videos=null] {String|Array} - Video or videos to play
- * @param [args=null] {Object} - Args to use for playing
- * @param [loop=false] {Boolean} - If must loop videos
- * @throws {TypeError} Argument "videos" must be a {String} or an {Array}
- * @throws {Error} Argument "videos" cannot be an empty {Array}
- * @throws {TypeError} Argument "args" must be an {Object}
- */
-_this.play = function (videos, args, loop) {
-  if (_omxProcess) {
-    if (_paused) {
-      _sendAction('pause');
-      _paused = false;
-      _this.emit('play', _currentVideo);
-    }
-  } else {
-    if (typeof videos !== 'string' &amp;&amp; !(videos instanceof Array)) throw new TypeError('Argument "videos" must be a String or an Array!');
-    if (!videos) throw new Error('Argument "videos" cannot be an empty Array!');
-    if (typeof args === 'undefined') args = {};
-    if (typeof args !== 'object') throw new TypeError('Argument "args" must be an object!');
-    if (typeof loop === 'undefined') loop = false;
-
-    // Convert videos string to an array for underlying startup
-    if (typeof videos === 'string') {
-      videos = [videos];
-    }
-    _startup(videos, args, loop);
-  }
-};
-
-
 /** @constructor */
 var OmxManager = function () {
+  for (var action in _commands) {
+    if (_commands.hasOwnProperty(action)) {
+      (function(key) {
+        _this[action] = function () {
+          if (!_omxProcess) return;
+
+          _sendAction(key);
+        };
+      })(_commands[action]);
+    }
+  }
+
   return _this;
 };
 
@@ -417,13 +524,13 @@ module.exports = OmxManager();</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Looper.html">Looper</a></li><li><a href="OmxManager.html">OmxManager</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_resolveVideosPath">_resolveVideosPath</a></li><li><a href="global.html#_sendAction">_sendAction</a></li><li><a href="global.html#_startup">_startup</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Looper.html">Looper</a></li><li><a href="OmxManager.html">OmxManager</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Fri Jul 04 2014 20:55:40 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Sat Jul 05 2014 15:07:36 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
