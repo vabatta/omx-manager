@@ -1,22 +1,45 @@
 # Module omx-manager
+ 1. [Presentation](#presentation)
+ 2. [Features](#features)
+ 3. [Usage](#usage)
+    3.1. [Basic usage](#basicusage)
+    3.2. [Multiple files](#multiple)
+    3.3. [Loop support](#loop)
+    3.4. [Arguments](#arguments)
+    3.5. [Built-in fix for omxplayer hanging](#omxhanging)
+    3.6. [Status](#status)
+    3.7. [Videos directory](#videosdirectory)
+    3.8. [Videos extension](#videosextension)
+    3.9. [Omx command](#omxcommand)
+    3.10. [Other methods](#othermethods)
+    3.11. [Events](#events)
+ 4. [Todo](#todo)
 
+**Note**: Complete **documentation** can be found on [github repo pages](http://vabatta.github.io/omx-manager/).
+
+
+<a name="presentation"></a>
+## Presentation
 `omx-manager` is a Nodejs module providing a simple and complete interface to *official* [omxplayer](https://github.com/popcornmix/omxplayer). <br />
+You can install through npm with `$> npm install omx-manager`. <br />
 **Note:** You can also use a fork version, but you should adjust `omx-manager` according to your version. <br />
 **Note 2:** This README is made with *official* [omxplayer](https://github.com/popcornmix/omxplayer) in mind.
 
 
+<a name="features"></a>
 ## Features
- * Supports multiple files 
+ * Supports multiple files
  * Supports loop
- * Supports `omxplayer` native loop (with some conditions, see [below](#nativeloop))
- * Provide a fallback if `omxplayer` doesn't support loop natively
- * Can take any arguments to use when spawning
+    * Supports `omxplayer` muliple native loop (in case you have it, see [below](#loop))
+    * Provide a fallback if `omxplayer` doesn't support loop natively
+ * Supports all arguments
+ * Built-in fix for `omxplayer` hanging (reported [here](https://github.com/popcornmix/omxplayer/issues/124))
 
-**Note**: Complete **doc** can be found on [github repo pages](http://vabatta.github.io/omx-manager/).
- 
 
+<a name="usage"></a>
 ## Usage
 
+<a name="basicusage"></a>
 ### Basic usage
 ```javascript
 var omx = require('omx-manager');
@@ -24,6 +47,7 @@ omx.play('video.avi');
 ```
 
 
+<a name="multiple"></a>
 ### Multiple files
 ```javascript
 omx.play(['video.avi', 'anothervideo.mp4', 'video.mkv']);
@@ -32,9 +56,8 @@ omx.play(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 **WARNING:** at this time, multiple files playing is not supported by *official* `omxplayer`, so `omx-manager` will handle it.
 
 
-<a name="nativeloop"></a>
-### Native loop support
-
+<a name="loop"></a>
+### Loop support
 *Official* `omxplayer` supports native loop with `--loop` flag (but only for 1 video):
 ```javascript
 var omx = require('omx-manager');
@@ -73,31 +96,33 @@ If you `enableMultipleNativeLoop` and use loop flag while passing the argument `
 var omx = require('omx-manager');
 omx.enableMultipleNativeLoop();
 omx.play(['video.avi', 'anothervideo.avi'], { '--loop': true }, true);
-// last argument in play will be ignored
+// argument loop in play will be ignored
+// will spawn omx process with '--loop'
 ```
 
-Otherwise, if you pass the argument `loop=true` to `play` method and the loop flag without `enableMultipleNativeLoop`, will **ignore** the **flag**:
+Otherwise, if you don't `enableMultipleNativeLoop` and use loop flag while passing the argument `loop=true` to `play` method, `omxmanager` will **ignore** the **flag** `--loop`:
 
 ```javascript
 var omx = require('omx-manager');
 omx.play(['video.avi', 'anothervideo.avi'], { '--loop': true }, true);
 // flag '--loop' will be ignored
+// will spawn omx process without '--loop' and 'omx-manager' will handle loop
 ```
 
 #### How works loop fallback
-
 *Official* `omxplayer` **doesn't** supports native loop over **multiple files**, so `omx-manager` provide a fallback:
 once a video is ended, another omx process is spawned.
 
 
+<a name="arguments"></a>
 ### Arguments
+Any arguments declared in the `omxplayer` repository.<br />
+To set an argument with value use `'argument': <value>` otherwise, if argument doesn't have a value, use `'argument': true`.
 
-Any arguments declared in the `omxplayer` repository.
-This is an object, and to set an argument with value use `'argument': <value>` otherwise use `'argument': true` to enable it.
+**Note**: If you set an argument that `omxplayer` doesn't support or declare, `omx-manager` will anyway add it to the omx process spawn. 
+This mean that will be the `omxplayer` itself to handle the argument.
 
-**Note**: If you set an argument that `omxplayer` doesn't support or declare, `omx-manager` will anyway add it to the spawn. This mean that will be the `omxplayer` itself to handle the argument.
-
-Note: About **loop** see [above](#nativeloop).
+Note: About **loop** see [above](#loop).
 
 #### Example object
 ```javascript
@@ -117,6 +142,19 @@ omx.play('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
 ```
 
 
+<a name="omxhanging"></a>
+### Built-in fix for omxplayer hanging
+*Official* `omxplayer` could hang randomly while playing video (reported [here](https://github.com/popcornmix/omxplayer/issues/124)), so `omx-manager` have a built-in fix for this.
+
+To enable it, just use:
+```javascript
+omx.enableHangingHandler();
+```
+
+This is a timeout sending a `pkill <omxcommand>`.
+
+
+<a name="status"></a>
 ### Status
 ```javascript
 var status = omx.getStatus();
@@ -141,6 +179,7 @@ If process is running:
 ```
 
 
+<a name="videosdirectory"></a>
 ### Videos directory
 ```javascript
 omx.setVideosDirectory('my/base/path');
@@ -160,12 +199,15 @@ omx.play(['foo.mp4', 'bar.mp4', 'baz.mp4']);
 ```
 
 
+<a name="videosextension"></a>
 ### Videos extension
 ```javascript
 omx.setVideosExtension('.extension');
 ```
 
 Set an extension for videos. Useful when all videos share the same format.
+
+**Note:** You must set a full extension including initial dot.
 
 Instead of this:
 ```javascript
@@ -179,31 +221,35 @@ omx.play(['foo', 'bar', 'baz']);
 ```
 
 
+<a name="omxcommand"></a>
 ### Omx command
 ```javascript
 omx.setOmxCommand('/path/to/my/command');
 ```
 
-Set the default command to spawn. Useful when `omxplayer` isn't in your path or you want to specify a different name for the spawn.
+Set the default command to spawn. 
+
+Useful when `omxplayer` isn't in your path or you want to specify a different name for the spawn.
 ```javascript
 omx.setOmxCommand('/usr/local/bin/mxplayer');
 omx.play('video.avi'); // the process is spawned calling '/usr/local/bin/mxplayer'
 ```
 
 
+<a name="othermethods"></a>
 ### Other methods
 ```javascript
-omx.pause();
 omx.play();
+omx.pause();
 omx.stop();
-omx.decreaseSpeed();
 omx.increaseSpeed();
-omx.previousAudioStream();
+omx.decreaseSpeed();
 omx.nextAudioStream();
-omx.previousChapter();
+omx.previousAudioStream();
 omx.nextChapter();
-omx.previousSubtitleStream();
+omx.previousChapter();
 omx.nextSubtitleStream();
+omx.previousSubtitleStream();
 omx.toggleSubtitles();
 omx.increaseSubtitleDelay();
 omx.decreaseSubtitleDelay();
@@ -214,32 +260,37 @@ omx.seekBackward();
 omx.seekFastForward();
 omx.seekFastBackward();
 
-var loaded = omx.isLoaded();
+var loaded = omx.isLoaded(); 
 var playing = omx.isPlaying();
 ```
 
-Refer to [doc](http://vabatta.github.io/omx-manager/) for complete information about api.
+Refer to [documentation](http://vabatta.github.io/omx-manager/) for complete information about api.
 
 
+<a name="events"></a>
 ### Events
 ```javascript
-// videos successfully loaded and started (first time start)
-omx.on('load', function(videos, args) {});
+// 'omx-manager' successfully loaded and started at first time
+// (when called 'play()' for the first time, but you still have a fire of 'play' event for first video)
+omx.on('load', function(videos, arguments) {});
     
-// when successfully started a video or resumed from pause
+// successfully started a video or resumed from pause
 omx.on('play', function(video) {});  
     
-// when successfully paused
+// successfully paused a video
 omx.on('pause', function() {}); 
     
-// when successfully stopped (omxplayer process ends)
+// successfully stopped a video (omxplayer process ends)
 omx.on('stop', function() {}); 
     
-// when videos to play are ended (never called if you are in looping condition)
+// videos to play are ended (never called if you are in looping condition)
 omx.on('end', function() {}); 
 ```
 
+Refer to [documentation](http://vabatta.github.io/omx-manager/) for complete information about events.
 
+
+<a name="todo"></a>
 ## TODO
-  
+
 Your suggestions are welcome!
