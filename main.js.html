@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>JSDoc: Source: main.js</title>
+	<head>
+		<meta charset="utf-8">
+		<title>JSDoc: Source: main.js</title>
+		<script src="scripts/prettify/prettify.js"></script>
+		<script src="scripts/prettify/lang-css.js"></script>
+		<link type="text/css" rel="stylesheet" href="styles/prettify-netbeans.css">
+		<link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	</head>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-
-<body>
-
-<div id="main">
-
-    <h1 class="page-title">Source: main.js</h1>
-
-    
+	<body>
+		<div id="main">
+			<!--<h1 class="page-title">Source: main.js</h1>-->
+			
 
 
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/*---- Require ----*/
-var spawn = require('child_process').spawn;
+<pre class="prettyprint source linenums"><code>/*---- Require ----*/
+var child_process = require('child_process');
+var spawn = child_process.spawn;
+var exec = child_process.exec;
 var path = require('path');
 var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
@@ -38,33 +31,19 @@ var _this = Object.create(EventEmitter.prototype);
 
 
 /*---- Members ----*/
-/**
- * @description Default directory to prepend to videos
- * @default 
- * @memberof OmxManager
- */
 var _videosDirectory = './';
-
-/**
- * @description Default extension to append to videos
- * @default ' '
- * @memberof OmxManager
- */
 var _videosExtension = '';
-
-/**
- * @description Default command to spawn
- * @default 
- * @memberof OmxManager
- */
 var _omxCommand = 'omxplayer';
-
-/**
- * @description Native loop argument support ('--loop')
- * @default
- * @memberof OmxManager
- */
 var _supportsMultipleNativeLoop = false;
+var _handleHanging = false;
+
+var _hanging = {
+  'timeout': null,
+  'videoDuration': null,
+  'videoStarted': null,
+  'videoRemaining': null,
+  'exitFunction': null
+};
 
 var _currentVideos = [];
 var _currentVideo = null;
@@ -74,11 +53,6 @@ var _looper = null;
 var _omxProcess = null;
 var _paused = false;
 
-/**
- * @private
- * @typedef {Object} OmxManager.Commands
- * @description Rapresents the default commands keys for Omxplayer
- */
 var _commands = {
   'decreaseSpeed': '1',
   'increaseSpeed': '2',
@@ -93,16 +67,16 @@ var _commands = {
   'decreaseSubtitleDelay': 'f',
   'increaseVolume': '+',
   'decreaseVolume': '-',
-  'seekForward': '\x5b\x43',
-  'seekBackward': '\x5b\x44',
-  'seekFastForward': '\x5b\x41',
+  'seekForward': '\x5B\x43',
+  'seekBackward': '\x5B\x44',
+  'seekFastForward': '\x5B\x41',
   'seekFastBackward': '\x5B\x42'
 };
 
 /*---- Private Functions ----*/
 /**
  * @private
- * @function _sendAction
+ * @function OmxManager._sendAction
  * @description Sends an action (key).
  * @param key {String} - The key to send
  */
@@ -112,6 +86,7 @@ var _sendAction = function (key) {
       if (err) {
         // Report/Emit this error?
         // This error was never fired during my tests on Rpi
+        //_this.emit('error', err);
       }
     });
   }
@@ -120,8 +95,8 @@ var _sendAction = function (key) {
 
 /**
  * @private
- * @function _resolveVideosPath
- * @description Resolve path of videos and returns only valid and existent videos array
+ * @function OmxManager._resolveVideosPath
+ * @description Resolve path of videos and returns only valid and existent videos array.
  * @param videos {Array} - Videos to check
  * @returns {Array} Valid videos
  */
@@ -132,13 +107,14 @@ var _resolveVideosPath = function (videos) {
 
     if (fs.existsSync(realPath)) {
       ret.push(realPath);
-    /*} else {
+    } else {
       var err = { 
         error: new Error('File not found: ' + realPath),
         notFound: true
       };
 
-      _this.emit('error', err);*/
+      // Report/Emit this error?
+      //_this.emit('error', err);
     }
   });
   return ret;
@@ -147,11 +123,12 @@ var _resolveVideosPath = function (videos) {
 
 /**
  * @private
- * @function _startup
- * @description Startup the player
+ * @function OmxManager._startup
+ * @description Startup the player.
  * @param videos {Array} - Videos to play
  * @param args {Object} - Args to use for playing
  * @param loop {Boolean} - If must loop videos
+ * @fires OmxManager#load
  */
 var _startup = function (videos, args, loop) {
   // reset videos with only valid and existent videos
@@ -199,6 +176,10 @@ var _startup = function (videos, args, loop) {
     _looper.getNext();
 
     respawn = function () {
+      if (_handleHanging &amp;&amp; _hanging.timeout) {
+        clearTimeout(_hanging.timeout);
+        _hanging.timeout = null;
+      }
       _this.emit('stop');
 
       // if looper is null, omx manager is stopped
@@ -213,6 +194,12 @@ var _startup = function (videos, args, loop) {
         _currentVideo = nextVideo;
         argsToSpawn[argsToSpawn.length - 1] = nextVideo;
 
+        if (_handleHanging) {
+          _hanging.exitFunction = respawn;
+          _hanging.videoStarted = new Date();
+          _setHangingHandler(_hanging.videoStarted);
+        }
+        
         _omxProcess = spawn(_omxCommand, argsToSpawn, {
           stdio: ['pipe', null, null]
         });
@@ -225,23 +212,99 @@ var _startup = function (videos, args, loop) {
       }
     };
 
+    if (_handleHanging) {
+      _hanging.exitFunction = respawn;
+      _hanging.videoStarted = new Date();
+      _setHangingHandler(_hanging.videoStarted);
+    }
+
     _omxProcess = spawn(_omxCommand, argsToSpawn, {
       stdio: ['pipe', null, null]
     });
     _omxProcess.once('exit', respawn);
   } else {
-    _omxProcess = spawn(_omxCommand, argsToSpawn, {
-      stdio: ['pipe', null, null]
-    });
-    _omxProcess.once('exit', function () {
+    var exitFunction = function () {
       _omxProcess = null;
       _this.emit('stop');
       _this.emit('end');
+    };
+
+    if (_handleHanging) {
+      _hanging.exitFunction = exitFunction;
+      _hanging.videoStarted = new Date();
+      _setHangingHandler(_hanging.videoStarted);
+    }
+
+    _omxProcess = spawn(_omxCommand, argsToSpawn, {
+      stdio: ['pipe', null, null]
     });
+    _omxProcess.once('exit', exitFunction);
   }
 
   _this.emit('load', _currentVideos, _currentArgs);
   _this.emit('play', _currentVideo);
+};
+
+
+/**
+ * @private
+ * @function OmxManager._omxKiller
+ * @description Kill all omxplayer processes.
+ * @param callback {Function} - Callback when finishes
+ */
+var _omxKiller = function (callback) {
+  exec('pkill ' + _omxCommand, function () {
+    callback();
+  });
+};
+
+
+/**
+ * @private
+ * @function OmxManager._getVideoDuration
+ * @description Get video duration.
+ * @param video {String} - Path of the video
+ * @param callback {Function} - Callback when finishes with first argument as duration in seconds or null.
+ */
+var _getVideoDuration = function (video, callback) {
+  exec(_omxCommand + ' --info ' + video, function (err, stdout, stderr) {
+    if (!err) {
+      var duration = /(Duration:\s)([\d.:]+)/g.exec(stderr);
+      if (duration) {
+        var durationArray = duration[2].split(':');
+        var seconds = Math.ceil(durationArray[0]) * 60 * 60 + Math.ceil(+durationArray[1]) * 60 + Math.ceil(+durationArray[2]);
+        callback(seconds);
+      } else {
+        // couldn't find duration for some reason
+        callback(null);
+      }
+    } else {
+      callback(null);
+    }
+  });
+};
+
+/**
+ * @private
+ * @function OmxManager._setHangingHandler
+ * @description Create timeout for 'omxplayer' hanging fix (https://github.com/popcornmix/omxplayer/issues/124).
+ * @param when {Date} - When set hanging is called (for right video remaining calculation)
+ */
+var _setHangingHandler = function (when) {
+  _getVideoDuration(_currentVideo, function (duration) {
+    if (duration) {
+      // Add 5 sec for delay
+      _hanging.videoDuration = (duration + 5) * 1000;
+      _hanging.videoRemaining = _hanging.videoDuration - Math.floor((when - _hanging.videoStarted) / 1000);
+
+      // Sets timeout to video duration (plus 5 sec delay) in order to kill hanging omxplayer
+      _hanging.timeout = setTimeout(function () {
+        _omxKiller(function () {
+          //_hanging.exitFunction();
+        });
+      }, _hanging.videoRemaining);
+    }
+  });
 };
 
 
@@ -315,28 +378,29 @@ var _startup = function (videos, args, loop) {
 
 /**
  * @function OmxManager.seekForward
- * @description Seek +30 s (sends key '\x5b\x43').
+ * @description Seek +30 s (sends '[C').
  */
 
 /**
  * @function OmxManager.seekBackward
- * @description Seek -30 s (sends key '\x5b\x44').
+ * @description Seek -30 s (sends '[D').
  */
 
 /**
  * @function OmxManager.seekFastForward
- * @description Seek +600 s (sends key '\x5b\x41').
+ * @description Seek +600 s (sends '[A').
  */
 
 /**
  * @function OmxManager.seekFastBackward
- * @description Seek -600 s (sends key '\x5B\x42').
+ * @description Seek -600 s (sends '[B').
  */
 
 
 /**
  * @function OmxManager.stop
  * @description Stops current Omx process (sends key 'q').
+ * @fires OmxManager#stop
  */
 _this.stop = function () {
   /* ignore if process isn't running */
@@ -344,6 +408,9 @@ _this.stop = function () {
 
   _sendAction('q');
   // handle with timeout
+  if (_handleHanging &amp;&amp; _hanging.timeout) {
+    clearTimeout(_hanging.timeout);
+  }
   _looper = null;
   _omxProcess = null;
 };
@@ -352,6 +419,7 @@ _this.stop = function () {
 /**
  * @function OmxManager.pause
  * @description Pauses video (sends key 'p').
+ * @fires OmxManager#pause
  */
 _this.pause = function () {
   if (_paused) return;
@@ -359,6 +427,9 @@ _this.pause = function () {
   if (!_omxProcess) return;
 
   _sendAction('p');
+  if (_handleHanging &amp;&amp; _hanging.timeout) {
+    clearTimeout(_hanging.timeout);
+  }
   _paused = true;
   _this.emit('pause');
 };
@@ -370,14 +441,19 @@ _this.pause = function () {
  * @param [videos=null] {String|Array} - Video or videos to play
  * @param [args=null] {Object} - Args to use for playing
  * @param [loop=false] {Boolean} - If must loop videos
- * @throws {TypeError} Argument "videos" must be a {String} or an {Array}
- * @throws {Error} Argument "videos" cannot be an empty {Array}
- * @throws {TypeError} Argument "args" must be an {Object}
+ * @throws {TypeError} Argument "videos" must be a String or an Array
+ * @throws {Error} Argument "videos" cannot be an empty Array
+ * @throws {TypeError} Argument "args" must be an Object
+ * @fires OmxManager#play
+ * @fires OmxManager#load
  */
 _this.play = function (videos, args, loop) {
   if (_omxProcess) {
     if (_paused) {
       _sendAction('p');
+      if (_handleHanging) {
+        _setHangingHandler(new Date());
+      }
       _paused = false;
       _this.emit('play', _currentVideo);
     }
@@ -388,7 +464,7 @@ _this.play = function (videos, args, loop) {
     if (typeof args !== 'object') throw new TypeError('Argument "args" must be an object!');
     if (typeof loop === 'undefined') loop = false;
 
-    // Convert videos string to an array for underlying startup
+    // Convert video string to an array for underlying startup
     if (typeof videos === 'string') {
       videos = [videos];
     }
@@ -400,8 +476,9 @@ _this.play = function (videos, args, loop) {
 /**
  * @function OmxManager.setVideosDirectory
  * @description Sets the default videos directory.
+ * @default './'
  * @param directory {String} - The default videos directory to prepend
- * @throws {TypeError} Argument "directory" must be a {String}
+ * @throws {TypeError} Argument "directory" must be a String
  */
 _this.setVideosDirectory = function (directory) {
   if (typeof directory !== 'string') throw new TypeError('Argument "directory" must be a String!');
@@ -413,8 +490,9 @@ _this.setVideosDirectory = function (directory) {
 /** 
  * @function OmxManager.setVideosExtension
  * @description Sets the default videos extension (this is just an append to filename).
+ * @default ''
  * @param extension {String} - The default videos extension to append
- * @throws {TypeError} Argument "extension" must be a {String}
+ * @throws {TypeError} Argument "extension" must be a String
  */
 _this.setVideosExtension = function (extension) {
   if (typeof extension !== 'string') throw new TypeError('Argument "extension" must be a String!');
@@ -426,8 +504,9 @@ _this.setVideosExtension = function (extension) {
 /**
  * @function OmxManager.setOmxCommand
  * @description Sets the default omxplayer executable path.
+ * @default 'omxplayer'
  * @param command {String} - The default command to spawn
- * @throws {TypeError} Argument "command" must be a {String}
+ * @throws {TypeError} Argument "command" must be a String
  */
 _this.setOmxCommand = function (command) {
   if (typeof command !== 'string') throw new TypeError('Argument "command" must be a String!');
@@ -438,10 +517,21 @@ _this.setOmxCommand = function (command) {
 
 /**
  * @function OmxManager.enableMultipleNativeLoop
+ * @default false
  * @description Sets that omxplayer supports multiple native loop.
  */
 _this.enableMultipleNativeLoop = function () {
   _supportsMultipleNativeLoop = true;
+};
+
+
+/**
+ * @function OmxManager.enableHangingHandler
+ * @default false
+ * @description Enable if 'omx-manager' should handle 'omxplayer' hanging ({@link https://github.com/popcornmix/omxplayer/issues/124}).
+ */
+_this.enableHangingHandler = function () {
+  _handleHanging = true;
 };
 
 
@@ -497,7 +587,41 @@ _this.getStatus = function () {
 };
 
 
-/** @constructor */
+/**
+ * @event OmxManager#load
+ * @description 'omx-manager' successfully loaded and started at first time
+ * @param videos {Array} - Videos that are in playing list
+ * @param arguments {Object} - Arguments supplied to the spawn of Omx process
+ */
+
+/**
+ * @event OmxManager#play
+ * @description Successfully started a video or resumed from pause
+ * @param video {String} - Currently playing video
+ */
+
+/**
+ * @event OmxManager#pause
+ * @description Successfully paused a video
+ */
+
+/**
+ * @event OmxManager#stop
+ * @description Successfully stopped a video (omxplayer process ends)
+ */
+
+/**
+ * @event OmxManager#end
+ * @description Videos to play are ended (never called if you are in looping condition)
+ */
+
+/** 
+ * @class
+ * @static
+ * @description 
+ * This is the main 'omx-manager' class. &lt;br />
+ * This class is &lt;b>static&lt;/b>.
+ */
 var OmxManager = function () {
   for (var action in _commands) {
     if (_commands.hasOwnProperty(action)) {
@@ -515,25 +639,24 @@ var OmxManager = function () {
 };
 
 module.exports = OmxManager();</code></pre>
-        </article>
-    </section>
 
 
 
 
-</div>
+		</div>
 
-<nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Looper.html">Looper</a></li><li><a href="OmxManager.html">OmxManager</a></li></ul>
-</nav>
+		<div id="nav">
+			<h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Looper.html">Looper</a></li><li><a href="OmxManager.html">OmxManager</a></li></ul><h3>Events</h3><ul><li><a href="OmxManager.html#event:end">OmxManager#event:end</a></li><li><a href="OmxManager.html#event:load">OmxManager#event:load</a></li><li><a href="OmxManager.html#event:pause">OmxManager#event:pause</a></li><li><a href="OmxManager.html#event:play">OmxManager#event:play</a></li><li><a href="OmxManager.html#event:stop">OmxManager#event:stop</a></li></ul>
+		</div>
 
-<br clear="both">
+		<div id="footer">
+			Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Tue Jul 08 2014 02:44:32 GMT+0200 (CEST)
+			Template by <a href="mailto:pepa.linha@outlook.com">Pepa Linha</a>.
+		</div>
 
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha9</a> on Sat Jul 05 2014 15:07:36 GMT+0200 (CEST)
-</footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
-</body>
+		<script>prettyPrint();</script>
+		<script src="scripts/jquery-1.9.1.js"></script>
+		<script src="scripts/linenumber.js"></script>
+		<script src="scripts/main.js"></script>
+	</body>
 </html>

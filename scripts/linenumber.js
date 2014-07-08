@@ -1,21 +1,19 @@
 /*global document */
 (function() {
-    var source = document.getElementsByClassName('prettyprint source linenums');
+    var source = $(".prettyprint.source.linenums");
     var i = 0;
-    var lineNumber = 0;
     var lineId;
     var lines;
     var totalLines;
     var anchorHash;
 
-    if (source && source[0]) {
+    if (source.length) {
         anchorHash = document.location.hash.substring(1);
-        lines = source[0].getElementsByTagName('li');
+        lines = source.find('li');
         totalLines = lines.length;
 
         for (; i < totalLines; i++) {
-            lineNumber++;
-            lineId = 'line' + lineNumber;
+            lineId = 'line' + (i + 1);
             lines[i].id = lineId;
             if (lineId === anchorHash) {
                 lines[i].className += ' selected';
