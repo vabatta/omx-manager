@@ -36,10 +36,17 @@ class OmxManager extends EventEmitter {
 
   /**
    * @private
-   * If command supports multiple native loop.
+   * Support to native loop flag
    * @type {boolean}
    */
   _nativeLoop: boolean = false;
+
+  /**
+   * @private
+   * Support to native multiple files spawn.
+   * @type {boolean}
+   */
+  _nativeMultipleFiles: boolean = false;
 
   /**
    * New omxmanager instance.
@@ -77,11 +84,19 @@ class OmxManager extends EventEmitter {
   }
 
   /**
-   * Sets that ```omxplayer``` supports multiple native loop.
+   * Sets support to native loop flag.
    * @default false
    */
-  enableMultipleNativeLoop () {
+  enableNativeLoop () {
     this._nativeLoop = true
+  }
+
+  /**
+   * Sets support to native multiple files spawn.
+   * @default false
+   */
+  enableNativeMultipleFiles () {
+    this._nativeMultipleFiles = true
   }
 
   /**
@@ -114,13 +129,12 @@ class OmxManager extends EventEmitter {
    * Start a new instance and returns it.
    * @param  {Array<string>} videos Videos to play.
    * @param  {object} [args={}] Arguments passed to the process.
-   * @param  {boolean} [handleLoop=false] If need to handle multiple files loop.
    * @return {OmxInstance} The instance object.
    */
-  start (videos: Array<string>, args: object = {}, handleLoop: boolean = false): OmxInstance {
+  start (videos: Array<string>, args: object = {}): OmxInstance {
     videos = this._resolveVideosPath(videos)
 
-    let instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop, handleLoop)
+    let instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop, this._nativeMultipleFiles)
     instance.play()
 
     return instance

@@ -46,17 +46,17 @@ class OmxInstance extends EventEmitter {
 
   /**
    * @private
-   * If supports native loop or need a wrapper for videos.
+   * Support to native loop flag
    * @type {boolean}
    */
   _nativeLoop: boolean = false;
 
   /**
    * @private
-   * If need to handle loop with Iterable.
+   * Support to native multiple files spawn.
    * @type {boolean}
    */
-  _handleLoop: boolean = false;
+  _nativeMultipleFiles: boolean = false;
 
   /**
    * @private
@@ -86,16 +86,16 @@ class OmxInstance extends EventEmitter {
    * @param  {Array<string>} videos Videos to play.
    * @param  {object} args Arguments passed to the spawn command.
    * @param  {boolean} nativeLoop If native loop is supported.
-   * @param  {boolean} handleLoop If we need to handle loop with Iterable.
+   * @param  {boolean} nativeMultipleFiles If native multiple files spawn is supported.
    * @return {OmxInstance} New ```omxplayer``` instance.
    */
   constructor (manager: OmxManager, cmd: string, videos: Array<string>, args: object,
-      nativeLoop: boolean, handleLoop: boolean) {
+      nativeLoop: boolean, nativeMultipleFiles: boolean) {
     super()
 
     this._parentManager = manager
     this._nativeLoop = nativeLoop
-    this._handleLoop = handleLoop
+    this._nativeMultipleFiles = nativeMultipleFiles
     this._spawnCommand = cmd
     this._videos = new Iterable(videos)
     this._args = this._buildArgsToSpawn(args)
@@ -135,7 +135,7 @@ class OmxInstance extends EventEmitter {
       if (args.hasOwnProperty(key) && args[key]) {
         // Filter the --loop flag
         if (key === '--loop') {
-          if (this._nativeLoop || (this._videos.length === 1 && !this._handleLoop)) {
+          if (this._nativeLoop) {
             argsToSpawn.push(key)
           }
         } else {
@@ -152,9 +152,9 @@ class OmxInstance extends EventEmitter {
       }
     }
 
-    // If native loop is enabled (multiple files native supported), we push every videos
+    // If is enabled the multiple files native suppor, we push every videos
     // to the arguments to spawn, otherwise just the first
-    if (this._nativeLoop) {
+    if (this._nativeMultipleFiles) {
       argsToSpawn.push.apply(argsToSpawn, this._videos.toArray())
     } else {
       argsToSpawn.push(this._videos.get())
@@ -164,4 +164,5 @@ class OmxInstance extends EventEmitter {
   }
 }
 
+// Export class
 export default OmxInstance
