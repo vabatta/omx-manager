@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test/test",
     "check": "flow src",
-    "doc": "documentation build src/lib/** -f html -o docs",
+    "docs": "documentation build src/lib/** -f html -o docs",
     "build": "babel src -d ."
   },
   "repository": {
