@@ -108,7 +108,7 @@ class OmxInstance extends EventEmitter {
    * Contains the current state for the instance.
    * @type {StatusObject}
    */
-  state: StatusObject = {
+  _status: StatusObject = {
     pid: null,
     videos: [],
     args: {},
@@ -141,8 +141,8 @@ class OmxInstance extends EventEmitter {
       this._videos.setLoop()
     }
 
-    this.state.videos = this._videos.toArray()
-    this.state.args = this._originalArgs
+    this._status.videos = this._videos.toArray()
+    this._status.args = this._originalArgs
   }
 
   /**
@@ -150,11 +150,11 @@ class OmxInstance extends EventEmitter {
    * Set the state to end and emit event.
    */
   _setEndState () {
-    this.state.pid = null
-    this.state.videos = []
-    this.state.args = {}
-    this.state.current = ''
-    this.state.playing = false
+    this._status.pid = null
+    this._status.videos = []
+    this._status.args = {}
+    this._status.current = ''
+    this._status.playing = false
     this.emit('end')
   }
 
@@ -163,8 +163,8 @@ class OmxInstance extends EventEmitter {
    * Set the state to stop and emit event.
    */
   _setStopState () {
-    this.state.current = ''
-    this.state.playing = false
+    this._status.current = ''
+    this._status.playing = false
     this.emit('stop')
   }
 
@@ -173,9 +173,9 @@ class OmxInstance extends EventEmitter {
    * Set the state to play and emit event.
    */
   _setPlayState () {
-    this.state.current = this._videos.get()
-    this.state.playing = true
-    this.emit('play', this.state.current)
+    this._status.current = this._videos.get()
+    this._status.playing = true
+    this.emit('play', this._status.current)
   }
 
   /**
@@ -186,7 +186,7 @@ class OmxInstance extends EventEmitter {
     this._process = spawn(this._spawnCommand, this._args, {
       stdio: ['pipe', null, null]
     })
-    this.state.pid = this._process.pid
+    this._status.pid = this._process.pid
   }
 
   /**
@@ -259,6 +259,14 @@ class OmxInstance extends EventEmitter {
    */
   pause () {
     // TODO: pause playing video
+  }
+
+  /**
+   * Returns the current status object.
+   * @return {StatusObject}
+   */
+  getStatus (): StatusObject {
+    return this._status
   }
 
   /**
