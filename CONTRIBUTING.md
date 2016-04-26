@@ -6,7 +6,7 @@
 
 <a name="presentation"></a>
 ## Presentation
-The development of version >= 0.4.0 of `omx-manager` is done through a strictly
+The development of version >= 0.1.0 of `omx-manager` is done through a strictly
 process for a good overall module quality. <br />
 Built with the future in mind, the quality of the module is done by the following:
 
@@ -33,7 +33,7 @@ The tests are made with [chaijs](http://chaijs.com/) and [mocha](http://mochajs.
 
 <a name="scripts"></a>
 ## Scripts
-The following scripts (available through `package.json`) serves to compile code:
+The following scripts (available through `package.json`) serves to work with the code `$ npm run <script>`
 
   * "test": Runs the tests through `mocha`
     * requires `$ npm i -g mocha`
