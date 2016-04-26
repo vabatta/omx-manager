@@ -127,12 +127,23 @@ class OmxManager extends EventEmitter {
 
   /**
    * Start a new instance and returns it.
-   * @param  {Array<string>} videos Videos to play.
+   * @param  {Array<string>|string} videos Videos to play.
    * @param  {object} [args={}] Arguments passed to the process.
-   * @return {OmxInstance} The instance object.
+   * @return {OmxInstance|null} The instance object or null if empty.
    */
-  start (videos: Array<string>, args: object = {}): OmxInstance {
+  start (videos: Array<string>|string, args: object = {}): OmxInstance|null {
+    // Wrap videos to array if it's a string (sort of overload)
+    if (typeof videos === 'string') {
+      videos = [videos]
+    }
+
+    // Check for the paths
     videos = this._resolveVideosPath(videos)
+
+    // If videos are empty, return null
+    if (videos.length === 0) {
+      return null
+    }
 
     let instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop, this._nativeMultipleFiles)
     instance.play()
