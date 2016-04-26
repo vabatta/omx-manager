@@ -4,3 +4,7 @@ thumbs.db
 node_modules/
 doc/
 jsdoc3-template-master/
+dist/
+*.d.ts
+*.log
+*.tgz
