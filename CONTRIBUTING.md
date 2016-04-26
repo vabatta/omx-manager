@@ -4,7 +4,7 @@
 
 <a name="presentation"></a>
 ## Presentation
-The development of version >= 0.4.0 of ```omx-manager``` is done through a strictly
+The development of version >= 0.4.0 of `omx-manager` is done through a strictly
 process for a good overall module quality. <br />
 Built with the future in mind, the quality of the module is done by the following:
   * Javascript coding standard
@@ -20,3 +20,7 @@ Built with the future in mind, the quality of the module is done by the followin
   * Clean code by linting it => http://eslint.org/
   * Well documented => style http://usejsdoc.org/ and output http://documentation.js.org/
   * ES6 syntax and Object-Oriented Programming => https://babeljs.io/
+
+<a name="tests"></a>
+## Tests
+The tests are made with [chaijs](http://chaijs.com/) and [mocha](http://mochajs.org/).
