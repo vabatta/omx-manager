@@ -6,9 +6,12 @@ const manager1 = new OmxManager()
 manager1.setVideosDirectory('/home/pi/videos')
 manager1.setVideosExtension('.mkv')
 
-const instance = manager1.play('clash', { '-b': true })
-instance.on('load', (videos, args) => { console.log(videos, args) })
-instance.on('play', (video) => { console.log(video) })
-// instance.on('pause', () => { console.log('pause') })
-// instance.on('stop', () => { console.log('stop') })
+const instance = manager1.start(['sample', 'sample2'], { '-b': true, '--loop': true })
+instance.on('play', (video) => { console.log('play', video, instance.state) })
+instance.on('pause', () => { console.log('pause') })
+instance.on('stop', () => { console.log('stop') })
 instance.on('end', () => { console.log('end') })
+
+console.log(instance.state)
+
+instance.play()

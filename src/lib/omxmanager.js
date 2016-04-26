@@ -7,6 +7,8 @@ import path from 'path'
 import fs from 'fs'
 import OmxInstance from './omxinstance'
 
+const URI_REGEX = /^(.+):\/\//g
+
 /**
  * @class
  * @description
@@ -40,13 +42,6 @@ class OmxManager extends EventEmitter {
    * @type {boolean}
    */
   _nativeLoop: boolean = false;
-
-  /**
-   * @private
-   * Support to native multiple files spawn.
-   * @type {boolean}
-   */
-  _nativeMultipleFiles: boolean = false;
 
   /**
    * New omxmanager instance.
@@ -92,14 +87,6 @@ class OmxManager extends EventEmitter {
   }
 
   /**
-   * Sets support to native multiple files spawn.
-   * @default false
-   */
-  enableNativeMultipleFiles () {
-    this._nativeMultipleFiles = true
-  }
-
-  /**
    * @private
    * Resolve path of videos and returns only valid and existent videos array.
    * @param videos {Array<string>} - Videos to check
@@ -107,20 +94,27 @@ class OmxManager extends EventEmitter {
    */
   _resolveVideosPath (videos: Array<string>) {
     let ret: Array<string> = []
-    videos.forEach(function (video) {
-      var realPath = path.resolve(this._videosDirectory, video + this._videosExtension)
+    for (let i = 0; i < videos.length; i++) {
+      const video = videos[i]
 
-      if (fs.existsSync(realPath)) {
-        ret.push(realPath)
+      // Check if path is URI, otherwise treat as path
+      if (video.match(URI_REGEX)) {
+        ret.push(video)
       } else {
-        const err = {
-          error: new Error('File not found: ' + realPath)
-        }
+        const realPath = path.resolve(this._videosDirectory, video + this._videosExtension)
 
-        // Report/Emit this error?
-        this.emit('error', err)
+        if (fs.existsSync(realPath)) {
+          ret.push(realPath)
+        } else {
+          const err = {
+            error: new Error('File not found: ' + realPath)
+          }
+
+          // Report/Emit this error?
+          this.emit('error', err)
+        }
       }
-    })
+    }
 
     return ret
   }
@@ -145,8 +139,7 @@ class OmxManager extends EventEmitter {
       return null
     }
 
-    let instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop, this._nativeMultipleFiles)
-    instance.play()
+    const instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop)
 
     return instance
   }

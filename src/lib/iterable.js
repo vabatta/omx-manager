@@ -61,17 +61,10 @@ class Iterable {
   }
 
   /**
-   * Get the current item in array and move the cursor forward.
+   * Move to next video.
    */
-  getNext (): any {
-    let item = this.get()
-    if (item === null) {
-      return null
-    } else {
-      this._current++
-
-      return item
-    }
+  next () {
+    this._current++
   }
 
   /**
