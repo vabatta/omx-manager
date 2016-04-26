@@ -87,6 +87,13 @@ class Iterable {
   getCurrentIndex (): number {
     return this._current
   }
+
+  /**
+   * Set loop wrap around array when reaching end.
+   */
+  setLoop () {
+    this._loop = true
+  }
 }
 
 // Export class
