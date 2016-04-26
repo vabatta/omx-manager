@@ -29,9 +29,9 @@ You can install through npm with `$> npm install omx-manager`. <br />
 <a name="features"></a>
 ## Features
  * Supports multiple files (see [below](#multiple))
-    * Provide a fallback if `omxplayer` doesn't support it natively
+    * Provide a fallback **as** `omxplayer` doesn't support it natively
  * Supports loop (see [below](#loop))
-    * Provide a fallback if `omxplayer` doesn't support it natively
+    * Provide a fallback **if** `omxplayer` doesn't support it natively
  * Supports all arguments
     * Simply it doesn't filter any arguments
  * Built-in fix for `omxplayer` hanging (reported [here](https://github.com/popcornmix/omxplayer/issues/124))
@@ -56,12 +56,7 @@ var camera = manager.play('video.avi'); // OmxInstance
 manager.play(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 ```
 
-**WARNING:** at this time, multiple files playing is not supported by *official* `omxplayer`, so `omx-manager` will handle it.
-
-If your `omxplayer` fork supports it natively, you can enable the native support (and disable the internal fallback) with the following call:
-```javascript
-manager.enableNativeMultipleFiles();
-```
+**WARNING:** at this time multiple files playing is not supported by *official* `omxplayer`, so `omx-manager` will handle it.
 
 <a name="loop"></a>
 ### Loop support
@@ -72,19 +67,20 @@ manager.play('video.avi', {'--loop': true});
 // this will start omxplayer with '--loop'
 ```
 So will be the `omxplayer` process itself to handle the loop for the video.
+**WARNING:** this means that you **won't** get events `play` and `stop` because the underlaying process cannot notify `omx-manager` of the new start. For uniformity you *shouldn't* use the native loop.
 
-Otherwise, when you pass more than 1 video with a loop flag **or** you didn't enabled the `nativeLoop`, `omx-manager` will **ignore** that flag and provide a built-in fallback:
+Otherwise, when you pass **more than one video** with a loop flag **or** you **didn't enable** the `nativeLoop`, `omx-manager` will **ignore** that flag and provide a built-in fallback:
 ```javascript
 // manager.enableNativeLoop();
 manager.play('video.avi', {'--loop': true});
+manager.enableNativeLoop();
 manager.play(['video.avi', 'anothervideo.avi'], {'--loop': true});
-// this will start omxplayer without '--loop'
+// both will start omxplayer without '--loop'
 ```
 So will be the `omx-manager` to handle the loop, providing a fallback (see below).
 
 #### Loop fallback
-*Official* `omxplayer` **doesn't** supports native loop over **multiple files**, so `omx-manager` provide a fallback:
-once a video is ended, another omx process is spawned.
+*Official* `omxplayer` **doesn't** supports native loop over **multiple files**, so `omx-manager` provide a fallback: once a video is ended, another process is spawned.
 
 
 <a name="arguments"></a>
@@ -119,35 +115,30 @@ manager.play('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
 ### Built-in fix for omxplayer hanging
 *Official* `omxplayer` could hang randomly while playing video (reported [here](https://github.com/popcornmix/omxplayer/issues/124)), so `omx-manager` have a built-in fix for this.
 
-To enable it, just use:
+To enable it just use:
 ```javascript
-omx.enableHangingHandler();
+manager.enableHangingHandler();
 ```
 
-This is a timeout sending a `pkill <omxcommand>`.
+This is a timeout sending a `kill -SIGTERM <PID>`.
 
 
 <a name="status"></a>
 ### Status
 ```javascript
-var status = omx.getStatus();
+var status = instance.getStatus();
 ```
 
-Return an object with current status.
+Return an object with the current status.
 
-If process is not running:
-```javascript
-{ loaded: false }
-```
-
-If process is running:
+Composition
 ```javascript
 {
-  loaded: true,
-  videos: <Array>,    // videos array passed to play(videos, args)
-  current: <String>, // current video playing
-  args: <Object>,  // args object passed to play(videos, args)
-  playing: <Boolean>  // true if not paused, false if paused
+  pid: number|null,
+  videos: Array<string>,    // videos array passed to play(videos, args)
+  current: string, // current video playing
+  args: object,  // args object passed to play(videos, args)
+  playing: boolean  // true if not paused, false if paused
 }
 ```
 
@@ -157,8 +148,8 @@ If process is running:
 ```javascript
 manager.setVideosDirectory('my/base/path');
 ```
-
 Set where to look for videos. Useful when all videos are in the same directory.
+Default to  `./`
 
 Instead of this:
 ```javascript
@@ -177,8 +168,8 @@ manager.play(['foo.mp4', 'bar.mp4', 'baz.mp4']);
 ```javascript
 manager.setVideosExtension('.extension');
 ```
-
 Set an extension for videos. Useful when all videos share the same format.
+Default to  `''`
 
 **Note:** You must set a full extension **including** initial dot. In fact, this is just a *post-fix* to every path.
 
@@ -199,8 +190,8 @@ manager.play(['foo', 'bar', 'baz']);
 ```javascript
 manager.setOmxCommand('/path/to/my/command');
 ```
-
 Set the default command to spawn.
+Default to  `omxplayer`
 
 Useful when `omxplayer` isn't in your path or you want to specify a different name for the spawn.
 ```javascript
@@ -232,9 +223,6 @@ camera.seekForward();
 camera.seekBackward();
 camera.seekFastForward();
 camera.seekFastBackward();
-
-var loaded = camera.isLoaded();
-var playing = camera.isPlaying();
 ```
 
 Refer to [documentation](http://vabatta.github.io/omx-manager/) for complete information about api.
@@ -243,10 +231,6 @@ Refer to [documentation](http://vabatta.github.io/omx-manager/) for complete inf
 <a name="events"></a>
 ### Events
 ```javascript
-// 'omx-manager' successfully loaded and started at first time
-// (when called 'play()' for the first time, but you still have a fire of 'play' event for first video)
-camera.on('load', function(videos, arguments) {});
-
 // successfully started a video or resumed from pause
 camera.on('play', function(video) {});  
 
@@ -256,7 +240,7 @@ camera.on('pause', function() {});
 // successfully stopped a video (omxplayer process ends)
 camera.on('stop', function() {});
 
-// videos to play are ended (never called if you are in looping condition)
+// videos to play are ended (never called if you are in a loop condition)
 camera.on('end', function() {});
 ```
 
@@ -268,4 +252,4 @@ Refer to [documentation](http://vabatta.github.io/omx-manager/) for complete inf
 
 Your suggestions are welcome!
 
- * Syncing videos between different devices through a custom server (built-in) 
+ * Syncing videos between different devices through a custom server (built-in)
