@@ -1,7 +1,5 @@
 // @flow
 
-type object = { [key:string]: object|any }
-
 import { EventEmitter } from 'events'
 import path from 'path'
 import fs from 'fs'
@@ -92,7 +90,7 @@ class OmxManager extends EventEmitter {
    * @param videos {Array<string>} - Videos to check
    * @returns {Array<string>} Valid videos
    */
-  _resolveVideosPath (videos: Array<string>) {
+  _resolveVideosPath (videos: Array<string>): Array<string> {
     let ret: Array<string> = []
     for (let i = 0; i < videos.length; i++) {
       const video = videos[i]
@@ -139,8 +137,10 @@ class OmxManager extends EventEmitter {
       return null
     }
 
+    // Create the instance
     const instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop)
 
+    // Return back
     return instance
   }
 }

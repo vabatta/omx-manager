@@ -30,6 +30,7 @@ class Iterable {
   /**
    * Length of the underlaying array.
    * @type {number}
+   * @memberof Iterable
    */
   length: number;
 
