@@ -21,7 +21,7 @@ in the root.
 
 <a name="guidelines"></a>
 ## Guidelines
-  * Javascript standard coding style => http://standardjs.com/
+  * Javascript standard coding style => rules http://standardjs.com/ and style https://github.com/airbnb/javascript
   * Strongly-typed code => http://flowtype.org/
   * Clean code by linting it => http://eslint.org/
   * Well documented => style http://usejsdoc.org/ and output http://documentation.js.org/

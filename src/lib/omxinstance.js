@@ -39,7 +39,6 @@ import OmxManager from './omxmanager'
 import Iterable from './iterable'
 
 const spawn = ChildProcess.spawn
-const exec = ChildProcess.exec
 
 /**
  * @class
@@ -74,13 +73,6 @@ class OmxInstance extends EventEmitter {
    * @type {Array<any>}
    */
   _args: Array<any>;
-
-  /**
-   * @private
-   * Arguments passed to the constructor.
-   * @type {object}
-   */
-  _originalArgs: object;
 
   /**
    * @private
@@ -133,7 +125,6 @@ class OmxInstance extends EventEmitter {
     this._nativeLoop = nativeLoop
     this._spawnCommand = cmd
     this._videos = new Iterable(videos)
-    this._originalArgs = args
     this._args = this._buildArgsToSpawn(args)
 
     // If we need to handle loop (after built arguments), Iterable should cycle
@@ -142,7 +133,7 @@ class OmxInstance extends EventEmitter {
     }
 
     this._status.videos = this._videos.toArray()
-    this._status.args = this._originalArgs
+    this._status.args = args
   }
 
   /**
@@ -187,6 +178,7 @@ class OmxInstance extends EventEmitter {
       stdio: ['pipe', null, null]
     })
     this._status.pid = this._process.pid
+    // attach controller
   }
 
   /**
