@@ -52,7 +52,7 @@ var camera = manager.start('video.avi'); // OmxInstance
 <a name="multiple"></a>
 ### Multiple files
 ```javascript
-manager.play(['video.avi', 'anothervideo.mp4', 'video.mkv']);
+manager.start(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 ```
 
 **WARNING:** at this time multiple files playing is not supported by *official* `omxplayer`, so `omx-manager` will handle it.
@@ -105,8 +105,8 @@ This mean that will be the `omxplayer` itself to handle the argument.
 
 #### Example play
 ```javascript
-manager.play('video.mp4', {'-p': true}); // enables audio passthrough
-manager.play('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
+manager.start('video.mp4', {'-p': true}); // enables audio passthrough
+manager.start('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
 ```
 
 
