@@ -1,10 +1,11 @@
 .DS_Store
 thumbs.db
-*.log
-node_modules/
-doc/
-jsdoc3-template-master/
-dist/
 *.d.ts
 *.log
 *.tgz
+
+node_modules/
+/docs/
+/examples/
+/lib/
+/test/
