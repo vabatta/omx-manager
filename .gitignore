@@ -1,2 +1,5 @@
 node_modules/
-jsdoc3-template-master/
+/docs/
+/examples/
+/lib/
+/test/
