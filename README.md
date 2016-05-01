@@ -189,30 +189,6 @@ manager.start('video.avi'); // the process is spawned calling '/usr/local/bin/om
 
 <a name="othermethods"></a>
 ### Other methods
-```javascript
-manager.start();
-camera.play();
-camera.pause();
-camera.stop();
-camera.increaseSpeed();
-camera.decreaseSpeed();
-camera.nextAudioStream();
-camera.previousAudioStream();
-camera.nextChapter();
-camera.previousChapter();
-camera.nextSubtitleStream();
-camera.previousSubtitleStream();
-camera.toggleSubtitles();
-camera.increaseSubtitleDelay();
-camera.decreaseSubtitleDelay();
-camera.increaseVolume();
-camera.decreaseVolume();
-camera.seekForward();
-camera.seekBackward();
-camera.seekFastForward();
-camera.seekFastBackward();
-```
-
 Refer to [documentation](http://vabatta.github.io/omx-manager/) for complete information about api.
 
 
