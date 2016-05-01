@@ -37,7 +37,7 @@ The following scripts (available through `package.json`) serves to work with the
 
   * "test": Runs the tests through `mocha`
     * requires `$ npm i -g mocha`
-  * "check": Runs the tests over the `src` to check types validity (strongly-typed)
+  * "typecheck": Runs the tests over the `src` to check types validity (strongly-typing)
     * requires `$ npm i -g flow-bin`
   * "docs": Runs the tools to output documentation into `docs` folder
     * requires `$ npm i -g documentation`

@@ -1,10 +1,8 @@
 // @flow
 
 import { describe, it } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import Iterable from '../lib/iterable'
-
-const expect = chai.expect
 
 describe('Iterable', () => {
   describe('#get()', () => {

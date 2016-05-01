@@ -44,7 +44,8 @@ class DBusController {
           }
         })
       }
-    ], (error, results) => {
+    ],
+    (error, results) => {
       console.log(error)
     })
   }

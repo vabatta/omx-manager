@@ -6,13 +6,12 @@
     2. [Multiple files](#multiple)
     3. [Loop support](#loop)
     4. [Arguments](#arguments)
-    5. [Built-in fix for omxplayer hanging](#omxhanging)
-    6. [Status](#status)
-    7. [Videos directory](#videosdirectory)
-    8. [Videos extension](#videosextension)
-    9. [Omx command](#omxcommand)
-    10. [Other methods](#othermethods)
-    11. [Events](#events)
+    5. [Status](#status)
+    6. [Videos directory](#videosdirectory)
+    7. [Videos extension](#videosextension)
+    8. [Omx command](#omxcommand)
+    9. [Other methods](#othermethods)
+    10. [Events](#events)
   4. [Todo](#todo)
 
 **Note**: Complete **documentation** can be found on [github repo pages](http://vabatta.github.io/omx-manager/).
@@ -109,18 +108,6 @@ This mean that will be the `omxplayer` itself to handle the argument.
 manager.play('video.mp4', {'-p': true}); // enables audio passthrough
 manager.play('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
 ```
-
-
-<a name="omxhanging"></a>
-### Built-in fix for omxplayer hanging
-*Official* `omxplayer` could hang randomly while playing video (reported [here](https://github.com/popcornmix/omxplayer/issues/124)), so `omx-manager` have a built-in fix for this.
-
-To enable it just use:
-```javascript
-manager.enableHangingHandler();
-```
-
-This is a timeout sending a `kill -SIGTERM <PID>`.
 
 
 <a name="status"></a>
