@@ -6,8 +6,7 @@
 
 <a name="presentation"></a>
 ## Presentation
-The development of version >= 0.1.0 of `omx-manager` is done through a strictly
-process for a good overall module quality. <br />
+The development of version >= 0.1.0 of `omx-manager` is done through a strictly process for a good overall module quality. <br />
 Built with the future in mind, the quality of the module is done by the following:
 
   * Javascript coding standard
@@ -16,8 +15,7 @@ Built with the future in mind, the quality of the module is done by the followin
   * Well documented
   * ES6 syntax and Object-Oriented Programming
 
-All the code is written inside `src` folder, then compiled to respective sub-folders
-in the root.
+All the code is written inside `src` folder, then compiled to respective sub-folders in the root.
 
 <a name="guidelines"></a>
 ## Guidelines
