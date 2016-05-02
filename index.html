@@ -167,6 +167,11 @@
                   #constructor
                 </a>
                 <a
+                  href='#OmxManager.create'
+                  class='regular block'>
+                  #create
+                </a>
+                <a
                   href='#OmxManager.enableNativeLoop'
                   class='regular block'>
                   #enableNativeLoop
@@ -185,11 +190,6 @@
                   href='#OmxManager.setVideosExtension'
                   class='regular block'>
                   #setVideosExtension
-                </a>
-                <a
-                  href='#OmxManager.start'
-                  class='regular block'>
-                  #start
                 </a>
               <a
                 href='#Iterable'
@@ -1032,6 +1032,71 @@
 </section>
           </div>
         </div>
+        <div class='collapsible' id='OmxManager.create'>
+          <a href='#OmxManager.create'>
+            <code>
+              #create<span class='gray'>(videos, [args])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Create a new instance and returns it.</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+<section class='py2 clearfix'>
+  <h2 id='OmxManager.create' class='mt0'>
+    create<span class='gray'>(videos, [args])</span>
+  </h2>
+  
+  
+  
+  
+  
+  <p>Create a new instance and returns it.</p>
+
+    <h4>Parameters</h4>
+    <ul class='suppress-p-margin'>
+        <li>(
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>
+.<
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+>
+|
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+)
+ <strong>videos</strong>
+          :
+          <div class='force-inline'>
+            <p>Videos to play.</p>
+
+          </div>
+        </li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
+=
+ <strong>args</strong>
+            (default <code>{}</code>)
+          :
+          <div class='force-inline'>
+            <p>Arguments passed to the process.</p>
+
+          </div>
+        </li>
+    </ul>
+      <h4>Returns</h4>
+      <code>(
+OmxInstance
+|
+null
+)
+</code>
+      :
+      <div class='force-inline'>
+        <p>The instance object or null if empty.</p>
+
+      </div>
+</section>
+          </div>
+        </div>
         <div class='collapsible' id='OmxManager.enableNativeLoop'>
           <a href='#OmxManager.enableNativeLoop'>
             <code>
@@ -1162,71 +1227,6 @@
           </div>
         </li>
     </ul>
-</section>
-          </div>
-        </div>
-        <div class='collapsible' id='OmxManager.start'>
-          <a href='#OmxManager.start'>
-            <code>
-              #start<span class='gray'>(videos, [args])</span>
-            </code>
-            <div class='force-inline'>
-              <p>Start a new instance and returns it.</p>
-
-            </div>
-          </a>
-          <div class='collapser border px2'>
-<section class='py2 clearfix'>
-  <h2 id='OmxManager.start' class='mt0'>
-    start<span class='gray'>(videos, [args])</span>
-  </h2>
-  
-  
-  
-  
-  
-  <p>Start a new instance and returns it.</p>
-
-    <h4>Parameters</h4>
-    <ul class='suppress-p-margin'>
-        <li>(
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>
-.<
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
->
-|
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-)
- <strong>videos</strong>
-          :
-          <div class='force-inline'>
-            <p>Videos to play.</p>
-
-          </div>
-        </li>
-        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>
-=
- <strong>args</strong>
-            (default <code>{}</code>)
-          :
-          <div class='force-inline'>
-            <p>Arguments passed to the process.</p>
-
-          </div>
-        </li>
-    </ul>
-      <h4>Returns</h4>
-      <code>(
-OmxInstance
-|
-null
-)
-</code>
-      :
-      <div class='force-inline'>
-        <p>The instance object or null if empty.</p>
-
-      </div>
 </section>
           </div>
         </div>
