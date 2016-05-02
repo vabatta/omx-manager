@@ -7,7 +7,7 @@
     "test": "mocha test/test",
     "typecheck": "flow src",
     "docs": "documentation build src/lib/** -f html -o docs",
-    "build": "rm -rf lib/ examples/ test/ && babel src -d . --ignore src/decls"
+    "build": "rm -rf build/ && babel src -d ./build --ignore src/decls"
   },
   "repository": {
     "type": "git",
