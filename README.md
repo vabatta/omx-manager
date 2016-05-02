@@ -44,15 +44,16 @@ You can install through npm with `$> npm install omx-manager`. <br />
 ```javascript
 var OmxManager = require('omx-manager');
 var manager = new OmxManager(); // OmxManager
-var camera = manager.start('video.avi'); // OmxInstance
+var camera = manager.create('video.avi'); // OmxInstance
+camera.play(); // Will start the process to play videos
 ```
-**Note:** Whenever you `start()` something through the manager, you will get back an `OmxInstance` which serves to control the actual underlaying process.
+**Note:** Whenever you `create()` something through the manager, you will get back an `OmxInstance` which serves to control the actual underlaying process.
 
 
 <a name="multiple"></a>
 ### Multiple files
 ```javascript
-manager.start(['video.avi', 'anothervideo.mp4', 'video.mkv']);
+manager.create(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 ```
 
 **WARNING:** at this time multiple files playing is not supported by *official* `omxplayer`, so `omx-manager` will handle it.
@@ -62,7 +63,7 @@ manager.start(['video.avi', 'anothervideo.mp4', 'video.mkv']);
 *Official* `omxplayer` supports native loop with `--loop` flag (but only for 1 video), this means that the `--loop` flag will be appended to the process **ONLY** if the videos argument contains exactly **one** video:
 ```javascript
 manager.enableNativeLoop();
-manager.start('video.avi', {'--loop': true});
+manager.create('video.avi', {'--loop': true});
 // this will start omxplayer with '--loop'
 ```
 So will be the `omxplayer` process itself to handle the loop for the video. <br />
@@ -71,9 +72,9 @@ So will be the `omxplayer` process itself to handle the loop for the video. <br 
 Otherwise, when you pass **more than one video** with a loop flag **or** you **didn't enable** the `nativeLoop`, `omx-manager` will **ignore** that flag and provide a built-in fallback:
 ```javascript
 // manager.enableNativeLoop();
-manager.start('video.avi', {'--loop': true});
+manager.create('video.avi', {'--loop': true});
 manager.enableNativeLoop();
-manager.start(['video.avi', 'anothervideo.avi'], {'--loop': true});
+manager.create(['video.avi', 'anothervideo.avi'], {'--loop': true});
 // both will start omxplayer without '--loop'
 ```
 So will be the `omx-manager` to handle the loop, providing a fallback (see below).
@@ -105,8 +106,8 @@ This mean that will be the `omxplayer` itself to handle the argument.
 
 #### Example play
 ```javascript
-manager.start('video.mp4', {'-p': true}); // enables audio passthrough
-manager.start('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
+manager.create('video.mp4', {'-p': true}); // enables audio passthrough
+manager.create('video.mp4', {'-o': 'hdmi'}); // HDMI audio output
 ```
 
 
@@ -140,13 +141,13 @@ Default to  `./`
 
 Instead of this:
 ```javascript
-manager.start(['/home/pi/videos/foo.mp4', '/home/pi/videos/bar.mp4', '/home/pi/videos/baz.mp4']);
+manager.create(['/home/pi/videos/foo.mp4', '/home/pi/videos/bar.mp4', '/home/pi/videos/baz.mp4']);
 ```
 
 It's possible to use this shortcut:
 ```javascript
 manager.setVideosDirectory('/home/pi/videos/');
-manager.start(['foo.mp4', 'bar.mp4', 'baz.mp4']);
+manager.create(['foo.mp4', 'bar.mp4', 'baz.mp4']);
 ```
 
 
@@ -162,13 +163,13 @@ Default to  `''`
 
 Instead of this:
 ```javascript
-manager.start(['foo.mp4', 'bar.mp4', 'baz.mp4']);
+manager.create(['foo.mp4', 'bar.mp4', 'baz.mp4']);
 ```
 
 It's possible to use this shortcut:
 ```javascript
 manager.setVideosExtension('.mp4');
-manager.start(['foo', 'bar', 'baz']);
+manager.create(['foo', 'bar', 'baz']);
 ```
 
 
@@ -183,7 +184,7 @@ Default to  `omxplayer`
 Useful when `omxplayer` isn't in your path or you want to specify a different name for the spawn.
 ```javascript
 manager.setOmxCommand('/usr/local/bin/omxplayer-fork');
-manager.start('video.avi'); // the process is spawned calling '/usr/local/bin/omxplayer-fork'
+manager.create('video.avi'); // the process is spawned calling '/usr/local/bin/omxplayer-fork'
 ```
 
 

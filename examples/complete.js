@@ -10,7 +10,7 @@ var manager1 = new _main2.default();
 manager1.setVideosDirectory('/home/pi/videos');
 manager1.setVideosExtension('.mkv');
 
-var instance = manager1.start(['sample', 'sample2'], { '-b': true, '--loop': true });
+var instance = manager1.create(['sample', 'sample2'], { '-b': true, '--loop': true });
 instance.on('play', function (video) {
   console.log('play', video, instance.getStatus());
 });
