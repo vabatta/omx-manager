@@ -118,12 +118,12 @@ class OmxManager extends EventEmitter {
   }
 
   /**
-   * Start a new instance and returns it.
+   * Create a new instance and returns it.
    * @param  {Array<string>|string} videos Videos to play.
    * @param  {object} [args={}] Arguments passed to the process.
    * @return {OmxInstance|null} The instance object or null if empty.
    */
-  start (videos: Array<string>|string, args: object = {}): OmxInstance|null {
+  create (videos: Array<string>|string, args: object = {}): OmxInstance|null {
     // Wrap videos to array if it's a string (sort of overload)
     if (typeof videos === 'string') {
       videos = [videos]
