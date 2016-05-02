@@ -5,7 +5,5 @@ thumbs.db
 *.tgz
 
 node_modules/
-/docs/
-/examples/
-/lib/
-/test/
+docs/
+build/
