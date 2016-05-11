@@ -4,6 +4,7 @@ import { EventEmitter } from 'events'
 import path from 'path'
 import fs from 'fs'
 import OmxInstance from './omxinstance'
+import KeyboardController from './keyboardcontroller'
 
 const URI_REGEX = /^(.+):\/\//g
 
@@ -138,7 +139,7 @@ class OmxManager extends EventEmitter {
     }
 
     // Create the instance
-    const instance = new OmxInstance(this, this._spawnCommand, videos, args, this._nativeLoop)
+    const instance = new KeyboardController(this, this._spawnCommand, videos, args, this._nativeLoop)
 
     // Return back
     return instance
