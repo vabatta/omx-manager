@@ -62,6 +62,7 @@ class KeyboardController extends OmxInstance {
 
   stop () {
     if (this._process) {
+      if (this._handleLoop) this._process.removeAllListeners('exit')
       this._sendAction(COMMANDS['quit'])
     }
   }
