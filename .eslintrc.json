@@ -1,19 +1,20 @@
 {
-  "parser": "babel-eslint",
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "module",
-    "ecmaFeatures": {}
+  "env": {
+    "node": true
   },
-  "extends": "standard",
-  "plugins": [
-    "flow-vars",
-    "mocha"
-  ],
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "script"
+  },
+  "extends": "airbnb-base/legacy",
   "rules": {
-    "flow-vars/define-flow-type": 1,
-    "flow-vars/use-flow-type": 1,
-    "mocha/no-exclusive-tests": 2,
-    "no-useless-constructor": 0
+    "no-underscore-dangle": "off",
+    "max-len": "off",
+    "vars-on-top": "off",
+    "no-param-reassign": "off",
+    "brace-style": [
+        "error",
+        "stroustrup"
+    ]
   }
 }

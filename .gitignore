@@ -7,3 +7,4 @@ thumbs.db
 node_modules/
 docs/
 build/
+.vscode/
