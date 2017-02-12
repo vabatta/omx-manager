@@ -29,6 +29,7 @@ describe('OmxInstance', function () {
         '-p': true,
         '--vol': 13,
         '-p': true,
+        '-a': false,
         '--key-config': 'mycustom.txt',
         '--argument-that-doesnt-exists': true
       };
@@ -38,8 +39,8 @@ describe('OmxInstance', function () {
 
       var spawnArgs = instance._buildArgsToSpawn(args);
       expect(spawnArgs).to.include.members(['-o', 'hdmi', '-p', '--vol', '13', '--argument-that-doesnt-exists']);
-      expect(spawnArgs).to.not.include.members(['--loop', 'mycustom.txt']);
-      expect(instance.getStatus().loop).to.equal(true);
+      expect(spawnArgs).to.not.include.members(['--loop', '-a', 'mycustom.txt']);
+      expect(instance.getConfigurations().loop).to.equal(true);
     });
   });
 
@@ -47,7 +48,9 @@ describe('OmxInstance', function () {
     it('should spawn the underlaying process', function () {
       var instance = testOmx.create('sample1', {});
       instance._spawnProcess();
-      expect(instance.getStatus().pid).to.be.a('number');
+      expect(instance.getConfigurations().pid).to.be.a('number');
+      instance._killProcess();
+      // expect(instance.getConfigurations().pid).to.equal(null);
     });
   });
 
@@ -57,28 +60,43 @@ describe('OmxInstance', function () {
       omx.setDbusController(true);
       var instance = omx.create('./examples/sample1.mp4', {});
       expect(instance.getDbusControllerEnabled()).to.equal(true);
+      expect(instance.getConfigurations().dbusName).to.be.a('string');
     });
   });
 
-  describe('+getStatus', function () {
-    it('should return the status of the instance', function () {
-      var startingStatus = {
+  describe('+getConfigurations', function () {
+    it('should return the configurations of the instance', function () {
+      var startingConfig = {
         args: {},
         videos: ['./examples/sample1.mp4'],
-        current: '',
-        playing: false,
         loop: false,
-        pid: null
+        pid: null,
+        dbusName: null
       };
 
       var instance = testOmx.create('sample1', {});
-      var instanceStatus = instance.getStatus();
-      expect(instanceStatus).to.have.all.keys(startingStatus);
-      expect(instanceStatus).to.have.property('pid', null);
-      expect(instanceStatus.videos).to.be.instanceOf(Array);
+      var instanceStatus = instance.getConfigurations();
+      expect(instanceStatus).to.have.all.keys(startingConfig);
       expect(instanceStatus.args).to.be.instanceOf(Object);
-      expect(instanceStatus).to.have.property('current', '');
-      expect(instanceStatus).to.have.property('playing', false);
+      expect(instanceStatus.videos).to.be.instanceOf(Array);
+      expect(instanceStatus).to.have.property('loop', false);
+      expect(instanceStatus).to.have.property('pid', null);
+      expect(instanceStatus).to.have.property('dbusName', null);
+    });
+  });
+
+  describe('+getPlayback', function () {
+    it('should return the playback status of the instance', function () {
+      var startingPlayback = {
+        current: '',
+        playing: false
+      };
+
+      var instance = testOmx.create('sample1', {});
+      var playbackStatus = instance.getPlayback();
+      expect(playbackStatus).to.have.all.keys(startingPlayback);
+      expect(playbackStatus).to.have.property('current', '');
+      expect(playbackStatus).to.have.property('playing', false);
     });
   });
 });
