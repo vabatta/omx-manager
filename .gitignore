@@ -1,10 +1,48 @@
-.DS_Store
-thumbs.db
-*.d.ts
-*.log
-*.tgz
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
 
-node_modules/
+# Packages
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Built
 docs/
-build/
-.vscode/
+dist/
+
+# Dependencies
+bower_components/
+node_modules/
+vendor/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+.nfs*
+
+# IDE
+.idea
+.vscode
+
+# Config
+.env

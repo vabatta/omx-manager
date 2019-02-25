@@ -1,0 +1,9 @@
+# Ignore all files
+**/*.ts
+**/*.js
+
+# Except src and test
+!index.ts
+!examples/**/*
+!src/**/*
+!test/**/*

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "*": ["./types/*"] },
+    "target": "es2015",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "./dist"
+  },
+  "typedocOptions": {
+    "mode": "file",
+    "theme": "default",
+    "out": "docs"
+  },
+  "include": [
+    "./index.ts"
+  ]
+}

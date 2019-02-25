@@ -1,20 +1,17 @@
 {
-  "env": {
-    "node": true
-  },
+  "root": true,
+  "extends": ["plugin:@typescript-eslint/recommended", "standard"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
   "parserOptions": {
-    "ecmaVersion": 5,
-    "sourceType": "script"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
-  "extends": "airbnb-base/legacy",
   "rules": {
-    "no-underscore-dangle": "off",
-    "max-len": "off",
-    "vars-on-top": "off",
-    "no-param-reassign": "off",
-    "brace-style": [
-        "error",
-        "stroustrup"
-    ]
+    "brace-style": [ "error", "stroustrup" ],
+    "@typescript-eslint/indent": "off",
+    "@typescript-eslint/no-var-requires": "off"
   }
 }

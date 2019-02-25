@@ -6,32 +6,34 @@
 
 <a name="presentation"></a>
 ## Presentation
-The development of version >= 0.2.0 of `omx-manager` is done through a strictly process for a good overall module quality. <br />
+From version 0.3.0+ the development of `omx-manager` is done through a strict process for a good
+overall code and module quality. <br />
 The quality of the module is done by the following:
 
-  * Javascript coding standard
-  * Clean code by linting it
-  * Well documented
-  * Object-Oriented Programming
+  * Written in Typescript
+  * Standard coding style with StandardJS
+  * Well documented code
+  * Object-Oriented Programming pattern
 
-All the code is written inside the `lib` folder.
+All the source code is located inside the `src` folder.
 
 <a name="guidelines"></a>
 ## Guidelines
-  * Javascript standard coding style => rules http://standardjs.com/ and style https://github.com/airbnb/javascript
-  * Clean code by linting it => http://eslint.org/
-  * Well documented => style http://usejsdoc.org/ and output http://documentation.js.org/
-  * Object-Oriented Programming => Plain JS
+  * Typescript code => https://www.typescriptlang.org
+  * StandardJS style => https://standardjs.com
+  * Linting tool => https://eslint.org
+  * Well documented => https://typedoc.org
 
 <a name="tests"></a>
 ## Tests
-The tests are made with [chaijs](http://chaijs.com/) and [mocha](http://mochajs.org/).
+The tests are made with [Japa](https://github.com/thetutlage/japa) and [SinonJS](https://sinonjs.org).
 
 <a name="scripts"></a>
 ## Scripts
-The following scripts (available through `package.json`) serves to work with the code `$ npm run <script>`
+The scripts are declared in `package.json` and are runned by `$ npm run <script>` backed by `npx`.
 
-  * "test": Runs the tests through `mocha`
-    * requires `$ npm i -g mocha`
-  * "docs": Runs the tools to output documentation into `docs` folder
-    * requires `$ npm i -g jsdoc`
+  * `build`: Runs the Typescript compiler
+    <!-- * requires `$ npm i -g typescript` -->
+  * `test`: Runs the tests
+  * `docs`: Runs the tools to output documentation into `docs` folder
+    <!-- * requires `$ npm i -g typedoc` -->
